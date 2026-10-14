@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+bleak
+bleak-retry-connector
+bluetti-bt-lib
+pydantic

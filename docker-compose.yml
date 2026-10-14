@@ -1,0 +1,16 @@
+services:
+  bluetti-ac50p:
+    build: .
+    container_name: bluetti-ac50p
+    restart: unless-stopped
+    # BLE via BlueZ precisa falar com o D-Bus do SISTEMA (host), não tem
+    # como isolar isso numa rede de container normal nem sem acesso
+    # privilegiado. Essa é a receita padrão usada por outros projetos que
+    # fazem BLE em container (ex. integrações de Bluetooth do Home
+    # Assistant): host network + privileged + socket do D-Bus montado.
+    network_mode: host
+    privileged: true
+    volumes:
+      - /var/run/dbus:/var/run/dbus
+    environment:
+      - BLUETTI_POLL_INTERVAL=5

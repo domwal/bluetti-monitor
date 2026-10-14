@@ -77,6 +77,33 @@ python app.py
 
 Abra **http://localhost:8000** no navegador.
 
+## Docker
+
+**Só funciona com o host rodando Linux** (ex. Raspberry Pi, servidor
+Linux, VM Linux) — o backend precisa falar direto com o BlueZ do sistema
+via D-Bus para acessar o Bluetooth. **Docker Desktop no Windows ou Mac não
+tem passthrough de BLE**, então o container nunca veria o adaptador
+Bluetooth nessas plataformas; para desenvolvimento no Windows, use a
+instalação local (seção acima) em vez de Docker.
+
+No host Linux, o BlueZ (`bluetoothd`) precisa estar rodando normalmente
+fora do container — o compose só monta o socket do D-Bus pra falar com
+ele:
+
+```bash
+docker compose up -d --build
+```
+
+O `docker-compose.yml` usa `network_mode: host` + `privileged: true` +
+o socket `/var/run/dbus` montado — é a receita padrão para BLE em
+container (a mesma usada por outras integrações Bluetooth, como as do
+Home Assistant). Com rede em modo host, a porta já fica em
+`http://<ip-do-host>:8000` sem precisar mapear `ports:`.
+
+O intervalo de polling pode ser ajustado via variável de ambiente no
+próprio `docker-compose.yml` (`BLUETTI_POLL_INTERVAL`) ou depois, ao vivo,
+pela própria tela (ver seção de Uso).
+
 ## Uso
 
 1. **Escanear Bluetooth** — lista equipamentos próximos cujo nome começa
@@ -104,4 +131,6 @@ frontend/
   index.html
   style.css
   app.js
+start.ps1 / start.sh  # sobem o servidor localmente (Windows/Linux-Mac)
+Dockerfile / docker-compose.yml  # build/execução em container (só host Linux)
 ```
